@@ -40,7 +40,7 @@ class BaseModel {
     return result;
   }
   public async callQuery(query: string, connType: string = 'normal', isAll = false) {
-    console.log(query);
+    console.log("query",query);
     const result = db.default.pdo(query, connType, isAll);
     this.resetSelectSettings();
     return result;

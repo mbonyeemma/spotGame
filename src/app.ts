@@ -15,6 +15,8 @@ class App {
   constructor(controllers: Controller[]) {
     // config.initiate();
     this.app = express();
+    this.app.use(cors())
+
     this.getProcessInfo();
     this.initializeMiddlewares();
     this.initializeControllers(controllers);

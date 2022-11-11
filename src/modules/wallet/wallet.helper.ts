@@ -9,13 +9,13 @@ class WalletHelper extends BaseModel {
     this.tableName = 'assets';
   }
   // Gives currrency list on status
-  public async createAccount(userId: string, address:string, walletId:string) {
+  public async createAccount(userId: string, address: string, walletId: string) {
     return new Promise(async (resolve) => {
       const isAlreadyCreated: any = await this.isAccountExist(address);
       if (isAlreadyCreated === false) {
         this.callQuery(`CALL spCreateUser('${userId}','${address}');`).then(
           async (res) => {
-           resolve( await this.createWallet(walletId,address))
+            resolve(await this.createWallet(walletId, address))
           },
           (error) => {
             console.log(error)
@@ -28,34 +28,34 @@ class WalletHelper extends BaseModel {
     });
   }
 
-  public async createWallet(walletId:string,address: string) {
+  public async createWallet(walletId: string, address: string) {
     return new Promise(async (resolve) => {
-        this.callQuery(`CALL wpCreateWallet('${walletId}','${address}','${process.env.DEFAULT_CURRENCY}');`).then(
-          async (res) => {
-            // await this.getAddress(memberId);
-            resolve(true);
-          },
-          (error) => {
-            console.log(error)
-            resolve(RES_MSG.ERROR);
-          },
-        );
-     
+      this.callQuery(`CALL wpCreateWallet('${walletId}','${address}','${process.env.DEFAULT_CURRENCY}');`).then(
+        async (res) => {
+          // await this.getAddress(memberId);
+          resolve(true);
+        },
+        (error) => {
+          console.log(error)
+          resolve(RES_MSG.ERROR);
+        },
+      );
+
     });
   }
 
-  public async createSession(userId: string, token:string) {
+  public async createSession(userId: string, token: string) {
     return new Promise(async (resolve) => {
-        this.callQuery(`CALL spCreateSession('${userId}','${token}');`).then(
-          async (res) => {
-            // await this.getAddress(memberId);
-            resolve(true);
-          },
-          (error) => {
-            resolve(RES_MSG.ERROR);
-          },
-        );
-     
+      this.callQuery(`CALL spCreateSession('${userId}','${token}');`).then(
+        async (res) => {
+          // await this.getAddress(memberId);
+          resolve(true);
+        },
+        (error) => {
+          resolve(RES_MSG.ERROR);
+        },
+      );
+
     });
   }
 
@@ -103,35 +103,26 @@ class WalletHelper extends BaseModel {
     });
   }
 
-  
+
 
   public async PostTransaction(obj: any) {
     return new Promise((resolve) => {
-      this.callQuery(`CALL wpCreateTransaction(
-      '${obj.txId}',
-      '${obj.walletId}',
-      '${obj.amount}',
-      '${obj.currency_id}',
-      '${obj.tx_hash}',
-      '${obj.fromAddress}',
-      '${obj.toAddress}',
-      '${obj.transType}'`).then(
+      this.callQuery(`CALL wpCreateTransaction('${obj.txId}','${obj.walletId}',${obj.amount},${obj.currency_id},'${obj.tx_hash}','${obj.fromAddress}','${obj.toAddress}','${obj.transType}','${obj.status}');`).then(
         (res: any) => {
-            resolve(true);
+          resolve(true);
         },
         (error) => {
           console.log(error)
           resolve(false);
-        },
-      );
+        },);
     });
   }
 
-  public async UpdateBalance(walletId: string, newBalance:number) {
+  public async UpdateBalance(walletId: string, newBalance: number) {
     return new Promise((resolve) => {
       this.callQuery(`CALL wpUpdateBalance('${walletId}',${newBalance});`).then(
         (res: any) => {
-            resolve(true);
+          resolve(true);
         },
         (error) => {
           console.log(error)
@@ -141,7 +132,7 @@ class WalletHelper extends BaseModel {
     });
   }
 
-  public async GetAccountBalance(Address: string, currencyId:string) {
+  public async GetAccountBalance(Address: string, currencyId: string) {
     return new Promise((resolve) => {
       this.callQuery(`CALL wpGetWallet('${Address}','${currencyId}');`).then(
         (res: any) => {
@@ -152,7 +143,7 @@ class WalletHelper extends BaseModel {
               "currency": balanceInfo.currency_code,
               "updatedOn": balanceInfo.updated_on,
             }
-               resolve(balance);
+            resolve(balance);
           } else {
             resolve(false);
           }
@@ -164,12 +155,12 @@ class WalletHelper extends BaseModel {
     });
   }
 
-  public async GetCurrencyId(currency:string) {
+  public async GetCurrencyId(currency: string) {
     return new Promise((resolve) => {
       this.callQuery(`CALL GetCurrencyId('${currency}');`).then(
         (res: any) => {
           if (res.length > 0) {
-               resolve(res[0]);
+            resolve(res[0]);
           } else {
             resolve(false);
           }
@@ -181,22 +172,54 @@ class WalletHelper extends BaseModel {
     });
   }
 
-  public async GetWallet(Address: string,currencyId:string) {
-      return new Promise((resolve) => {
-        this.callQuery(`CALL wpGetWallet('${Address}','${currencyId}');`).then(
-          (res: any) => {
-            if (res.length > 0) {
-                 resolve(res[0]);
-            } else {
-              resolve(false);
-            }
-          },
-          (error) => {
+  public async GetWallet(Address: string, currencyId: string) {
+    return new Promise((resolve) => {
+      this.callQuery(`CALL wpGetWallet('${Address}','${currencyId}');`).then(
+        (res: any) => {
+          if (res.length > 0) {
+            resolve(res[0]);
+          } else {
             resolve(false);
-          },
-        );
-      });
-    }
+          }
+        },
+        (error) => {
+          resolve(false);
+        },
+      );
+    });
+  }
+  public async GetTransaction(transId: string) {
+    return new Promise((resolve) => {
+      this.callQuery(`CALL wpGetTransactionByHash('${transId}');`).then(
+        (res: any) => {
+          if (res.length > 0) {
+            resolve(res[0]);
+          } else {
+            resolve(false);
+          }
+        },
+        (error) => {
+          resolve(false);
+        },
+      );
+    });
+  }
+  public async UpdateTransactionStatus(transId: string, status: string) {
+    return new Promise((resolve) => {
+      this.callQuery(`CALL spUpdateTransactionStatus('${transId}','${status}');`).then(
+        (res: any) => {
+            resolve(true);
+        },
+        (error) => {
+          resolve(false);
+        },
+      );
+    });
+  }
+  
+  
+
+  
 
   public async isAccountExist(
     Address: string,
@@ -228,7 +251,7 @@ class WalletHelper extends BaseModel {
    * @param type // DEPOSIT OR WITHDRAW
    * @param amount
    */
- 
+
 
 
   public async getWithdrawFeeRevenue(data: any) {
