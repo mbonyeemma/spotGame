@@ -1,11 +1,8 @@
 import * as bodyParser from 'body-parser';
 import * as cookieParser from 'cookie-parser';
 import * as cors from 'cors';
-import * as ejs from 'ejs';
 import * as express from 'express';
-import * as fileUpload from 'express-fileupload';
 import * as path from 'path';
-import * as config from '../src/config/';
 import * as Helper from './helpers/index';
 import { Controller } from './interfaces';
 import { errorMiddleware } from './middlewares';

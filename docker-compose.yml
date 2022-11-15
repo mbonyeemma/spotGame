@@ -1,0 +1,14 @@
+version: '2'
+services:
+  game_service:
+    container_name: spot_c
+    ports:
+      - '0.0.0.0:6060:6060'
+    build: ./
+    env_file: ./src/config/local.env
+    restart: always
+    environment:
+      - NODE_ENV=stage   
+    # networks: 
+    #   my_network:
+    #     ipv4_address: 10.10.11.3
